@@ -72,6 +72,11 @@
  */
     /*=========================================================================
     =                 TODO: fill in these Helper Functions                    =
+
+    Position = (n^index - 1) + index
+    Column conlfict = Position % n === PositionOfNumber % n
+    Row conlfict = Floor of Position / n === Floor of PositionOfNumber / n
+    Diagonal conflict = 
     =========================================================================*/
 
     // ROWS - run from left to right
@@ -80,7 +85,9 @@
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
       var row = this.attributes[rowIndex];
-      return _.reduce(row, add) > 1;
+      return _.reduce(row, function(a, b) {
+        return a + b;
+      }) > 1;
     },
 
     // test if any rows on this board contain conflicts
@@ -126,13 +133,13 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     //minorDiagonalColumnIndexAtFirstRow
-    hasMajorDiagonalConflictAt: function(index) {
+    hasMajorDiagonalConflictAt: function(colNum) {
       var count = 0;
       var count1 = 0;
       
-      for (var i = 0; i < this.attributes.n - index; i++) {
-        count += this.attributes[index + i][i];
-        count1 += this.attributes[i][index + i];
+      for (var i = 0; i < this.attributes.n - colNum; i++) {
+        count += this.attributes[colNum + i][i];
+        count1 += this.attributes[i][colNum + i];
       }
 
       return count > 1 || count1 > 1;
@@ -154,17 +161,33 @@
     // --------------------------------------------------------------
     //
     // test if a specific minor diagonal on this board contains a conflict
-    hasMinorDiagonalConflictAt: function(index) {
-      var count = 0;
-      var count1 = 0;
-      index = this.attributes.n - index - 1;
-      
-      for (var i = 0; i < this.attributes.n - index; i++) {
-        count += this.attributes[i][index + i];
-        count1 += this.attributes[index + i][i];
+    hasMinorDiagonalConflictAt: function(colNum) {
+      var n = this.attributes.n;
+      var add = n - 1 - colNum; //Value added to indexes to get lower-right portion
+      var count = 0; //Count for upper-left half
+      var count2 = 0; //Count for lower-right half
+      //Terminate early for last column in board
+      if (colNum === n - 1) {
+        colNum = n / 2;
       }
+      for (var row = 0; row < colNum; row++) {
+        count += this.attributes[row][colNum - row];
+        //Avoid duplicates in same count
+        if (row !== colNum - row) {
+          count += this.attributes[colNum - row][row];
+        }
 
-      return count > 1 || count1 > 1;
+        count2 += this.attributes[row + add][colNum - row + add];
+        //Avoid duplicates in same count
+        if (row !== colNum - row) {
+          count2 += this.attributes[colNum - row + add][row + add];
+        }
+
+        if (count > 1 || count2 > 1) {
+          return true;
+        }
+      }
+      return false;
     },
 
     // test if any minor diagonals on this board contain conflicts
@@ -172,14 +195,12 @@
       var board = this.attributes;
       var result = false;
       for (var i = 0; i < board.n - 1; i++) {
-        result = result || this.hasMajorDiagonalConflictAt(i);
+        result = result || this.hasMinorDiagonalConflictAt(i);
       }
       return result;
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
-
-
   });
 
   var makeEmptyMatrix = function(n) {
@@ -188,10 +209,6 @@
         return 0;
       });
     });
-  };
-
-  var add = function(a, b) {
-    return a + b;
   };
 
 }());

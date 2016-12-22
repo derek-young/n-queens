@@ -84,10 +84,7 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
-      var row = this.attributes[rowIndex];
-      return _.reduce(row, function(a, b) {
-        return a + b;
-      }) > 1;
+      return _.reduce(this.attributes[rowIndex], (a, b) => a + b) > 1;
     },
 
     // test if any rows on this board contain conflicts

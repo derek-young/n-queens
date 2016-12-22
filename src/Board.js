@@ -135,14 +135,14 @@
     //minorDiagonalColumnIndexAtFirstRow
     hasMajorDiagonalConflictAt: function(colNum) {
       var count = 0;
-      var count1 = 0;
+      var count2 = 0;
       
       for (var i = 0; i < this.attributes.n - colNum; i++) {
         count += this.attributes[colNum + i][i];
-        count1 += this.attributes[i][colNum + i];
+        count2 += this.attributes[i][colNum + i];
       }
 
-      return count > 1 || count1 > 1;
+      return count > 1 || count2 > 1;
     },
 
     // test if any major diagonals on this board contain conflicts

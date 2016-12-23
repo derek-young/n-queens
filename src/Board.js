@@ -76,7 +76,7 @@
     Position = (n^index - 1) + index
     Column conlfict = Position % n === PositionOfNumber % n
     Row conlfict = Floor of Position / n === Floor of PositionOfNumber / n
-    Diagonal conflict = 
+    Diagonal conflict =
     =========================================================================*/
 
     // ROWS - run from left to right
@@ -89,23 +89,7 @@
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      return _.reduce(this.attributes, (prev, curr, key) => {
-        if (key !== 'n') {
-          //false || true ==> true
-          debugger;
-          return prev || this.hasRowConflictAt(key);
-        }
-        return prev || false;
-      }, false);
-
-      // var result = false;
-      // for (var key in this.attributes) {
-      //   if (Array.isArray(this.attributes[key])) {
-      //     result = result || this.hasRowConflictAt(key);
-      //   }
-      // }
-      // return result;
-
+      return this.boolReduce(false, 'hasRowConflictAt');
     },
 
 
@@ -115,25 +99,14 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
-      var count = 0;
-      for (var i = 0; i < this.attributes.n; i++) {
-        count += this.attributes[i][colIndex];
-      }
-      return count > 1;
+      return _.reduce(this.attributes, function(acc, row) {
+        return row === 4 ? acc + 0 : acc + row[colIndex];
+      }, 0) > 1;
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      return _.reduce(this.attributes, function (prev, curr, key) {
-        return key !== 'n' ? prev || this.hasColConflictAt(key) : prev || false;
-      }, false, this);
-
-      // var board = this.attributes;
-      // var result = false;
-      // for (var i = 0; i < board.n; i++) {
-      //   result = result || this.hasColConflictAt(i);
-      // }
-      // return result;
+      return this.boolReduce(false, 'hasColConflictAt');
     },
 
 
@@ -146,7 +119,7 @@
     hasMajorDiagonalConflictAt: function(colNum) {
       var count = 0;
       var count2 = 0;
-      
+
       for (var i = 0; i < this.attributes.n - colNum; i++) {
         count += this.attributes[colNum + i][i];
         count2 += this.attributes[i][colNum + i];
@@ -157,15 +130,7 @@
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      if (this.attributes.n < 2) {
-        return false;
-      }
-      var board = this.attributes;
-      var result = false;
-      for (var i = 0; i < board.n - 1; i++) {
-        result = result || this.hasMajorDiagonalConflictAt(i);
-      }
-      return result;
+      return this.boolReduce(false, 'hasMajorDiagonalConflictAt');
     },
 
 
@@ -190,18 +155,20 @@
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
-      if (this.attributes.n < 2) {
-        return false;
-      }
-      var board = this.attributes;
       var result = false;
-      for (var i = 0; i < board.n * 2; i++) {
+      for (var i = 0; i < this.attributes;.n * 2; i++) {
         result = result || this.hasMinorDiagonalConflictAt(i);
       }
       return result;
-    }
+    },
 
     /*--------------------  End of Helper Functions  ---------------------*/
+
+    boolReduce: function(bool, callback) {
+      return _.reduce(this.attributes, function(acc, row, key) {
+        return key === 'n' ? acc || false : acc || this[callback](Number(key));
+      }, bool, this);
+    }
   });
 
   var makeEmptyMatrix = function(n) {

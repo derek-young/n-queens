@@ -19,21 +19,19 @@ window.findNRooksSolution = function(n) {
   var solution = [];
   var validRows = [];
   if (n === 1) {
-    solution.push([1]);
-  }
-  if (n === 2) {
-    solution.push([[1, 0], [0, 1]]);
-    solution.push([[0, 1], [1, 0]]);
+    return [[1]];
   }
 
   for (var i = 0; i < n; i++) {
     var row = new Array(n);
     row.fill(0);
-    console.log(row, 'row');
     row[i] = 1;
     validRows.push(row);
   }
-  console.log(validRows);
+
+  for (var i = 0; i < validRows.length; i++) {
+    solution.push(validRows[i]);
+  }
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
@@ -47,16 +45,68 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var validRows = [];
+  if (n === 1) {
+    return [[1]];
+  }
+  if (n === 0) {
+    return [];
+  }
+  if (n === 3) {
+    return [[], [], []];
+  }
+  if (n === 2) {
+    return [[], []];
+  }
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  for (var i = 0; i < n; i++) {
+    var row = new Array(n);
+    row.fill(0);
+    row[i] = 1;
+    validRows.push(row);
+  }
+
+  var allOptions = perm(validRows);
+
+  for (var i = 0; i < allOptions.length; i++) {
+    var tempBoard = new Board(allOptions[i]);
+    if (!tempBoard.hasAnyMajorDiagonalConflicts() && !tempBoard.hasAnyMinorDiagonalConflicts()) {
+      console.log('Single solution for ' + n + ' queens:', JSON.stringify(allOptions[i]));
+      return allOptions[i];
+    }
+  }
+  return 'Oops, no solution found.';
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0;
+  var solutions = [];
+  var validRows = [];
+  if (n === 1 || n === 0) {
+    return 1;
+  }
+  if (n === 3 || n === 2) {
+    return 0;
+  }
 
+  for (var i = 0; i < n; i++) {
+    var row = new Array(n);
+    row.fill(0);
+    row[i] = 1;
+    validRows.push(row);
+  }
+
+  var allOptions = perm(validRows);
+
+  for (var i = 0; i < allOptions.length; i++) {
+    var tempBoard = new Board(allOptions[i]);
+    if (!tempBoard.hasAnyMajorDiagonalConflicts() && !tempBoard.hasAnyMinorDiagonalConflicts()) {
+      solutionCount++;
+      solutions.push(tempBoard);
+    }
+  }
+  debugger;
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
@@ -69,5 +119,25 @@ var factorial = function(n) {
 };
 
 
+var perm = function (values, currentCombo, allPerm) {
+  //first call: cC and aP will have no values
+  if (!currentCombo) {
+    currentCombo = [];
+  }
+  if (!allPerm) {
+    allPerm = [];
+  }
+  //base case
+  if (values.length < 1) {
+    allPerm.push(currentCombo);
+    return allPerm;
+  }
+  for (var i = 0; i < values.length; i++) {
+    var copy = values.slice();
+    var value = copy.splice(i, 1);
+    perm(copy, currentCombo.concat(value), allPerm);
+  }
+  return allPerm;
+};
 
 

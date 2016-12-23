@@ -45,6 +45,7 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
+  var validOptions;
   var validRows = [];
   if (n === 1) {
     return [[1]];
@@ -65,23 +66,14 @@ window.findNQueensSolution = function(n) {
     row[i] = 1;
     validRows.push(row);
   }
+  var validOptions = perm(validRows);
 
-  var allOptions = perm(validRows);
-
-  for (var i = 0; i < allOptions.length; i++) {
-    var tempBoard = new Board(allOptions[i]);
-    if (!tempBoard.hasAnyMajorDiagonalConflicts() && !tempBoard.hasAnyMinorDiagonalConflicts()) {
-      console.log('Single solution for ' + n + ' queens:', JSON.stringify(allOptions[i]));
-      return allOptions[i];
-    }
-  }
-  return 'Oops, no solution found.';
+  return validOptions[0];
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = 0;
-  var solutions = [];
+  var validOptions;
   var validRows = [];
   if (n === 1 || n === 0) {
     return 1;
@@ -97,17 +89,10 @@ window.countNQueensSolutions = function(n) {
     validRows.push(row);
   }
 
-  var allOptions = perm(validRows);
+  var validOptions = perm(validRows);
 
-  for (var i = 0; i < allOptions.length; i++) {
-    var tempBoard = new Board(allOptions[i]);
-    if (!tempBoard.hasAnyMajorDiagonalConflicts() && !tempBoard.hasAnyMinorDiagonalConflicts()) {
-      solutionCount++;
-      solutions.push(tempBoard);
-    }
-  }
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+  console.log('Number of solutions for ' + n + ' queens:', validOptions.length);
+  return validOptions.length;
 };
 
 var factorial = function(n) {
@@ -122,9 +107,10 @@ var perm = function (values, currentCombo, allPerm) {
   currentCombo = currentCombo || [];
   allPerm = allPerm || [];
 
-  //base case
   if (values.length < 1) {
-    allPerm.push(currentCombo);
+    if (!hasAnyMinorConflicts(currentCombo) && !hasAnyMajorConflicts(currentCombo)) {
+      allPerm.push(currentCombo);
+    }
     return allPerm;
   }
   for (var i = 0; i < values.length; i++) {
@@ -135,4 +121,43 @@ var perm = function (values, currentCombo, allPerm) {
   return allPerm;
 };
 
+var hasMajorConflictAt = function(colNum, arr) {
+  var count = 0;
+  var count2 = 0;
 
+  for (var i = 0; i < arr.length - colNum; i++) {
+    count += arr[colNum + i][i];
+    count2 += arr[i][colNum + i];
+  }
+
+  return count > 1 || count2 > 1;
+};
+
+
+var hasAnyMajorConflicts = function(arr) {
+  return _.reduce(arr, function(acc, row, key) {
+    return acc || hasMajorConflictAt(key, arr);
+  }, false);
+};
+
+var hasMinorConflictAt = function(colNum, arr) {
+  var n = arr.length;
+  var count = 0;
+  var col = colNum;
+
+  for (var row = 0; col >= 0 && row < n; row++) {
+    if (col < n) {
+      count += arr[row][col];
+    }
+    col--;
+  }
+  return count > 1;
+};
+
+var hasAnyMinorConflicts = function(arr) {
+  var result = false;
+  for (var i = 0; i < arr.length * 2; i++) {
+    result = result || hasMinorConflictAt(i, arr);
+  }
+  return result;
+};

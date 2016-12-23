@@ -106,7 +106,6 @@ window.countNQueensSolutions = function(n) {
       solutions.push(tempBoard);
     }
   }
-  debugger;
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
@@ -120,13 +119,9 @@ var factorial = function(n) {
 
 
 var perm = function (values, currentCombo, allPerm) {
-  //first call: cC and aP will have no values
-  if (!currentCombo) {
-    currentCombo = [];
-  }
-  if (!allPerm) {
-    allPerm = [];
-  }
+  currentCombo = currentCombo || [];
+  allPerm = allPerm || [];
+
   //base case
   if (values.length < 1) {
     allPerm.push(currentCombo);

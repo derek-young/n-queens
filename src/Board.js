@@ -89,14 +89,23 @@
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      var board = this.attributes;
-      var result = false;
-      for (var key in board) {
-        if (Array.isArray(board[key])) {
-          result = result || this.hasRowConflictAt(key);
+      return _.reduce(this.attributes, (prev, curr, key) => {
+        if (key !== 'n') {
+          //false || true ==> true
+          debugger;
+          return prev || this.hasRowConflictAt(key);
         }
-      }
-      return result;
+        return prev || false;
+      }, false);
+
+      // var result = false;
+      // for (var key in this.attributes) {
+      //   if (Array.isArray(this.attributes[key])) {
+      //     result = result || this.hasRowConflictAt(key);
+      //   }
+      // }
+      // return result;
+
     },
 
 
@@ -115,12 +124,16 @@
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      var board = this.attributes;
-      var result = false;
-      for (var i = 0; i < board.n; i++) {
-        result = result || this.hasColConflictAt(i);
-      }
-      return result;
+      return _.reduce(this.attributes, function (prev, curr, key) {
+        return key !== 'n' ? prev || this.hasColConflictAt(key) : prev || false;
+      }, false, this);
+
+      // var board = this.attributes;
+      // var result = false;
+      // for (var i = 0; i < board.n; i++) {
+      //   result = result || this.hasColConflictAt(i);
+      // }
+      // return result;
     },
 
 

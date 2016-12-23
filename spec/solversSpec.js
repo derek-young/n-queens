@@ -45,7 +45,7 @@ describe('solvers', function() {
             return memo + col;
           }, 0);
         }, 0);
-        
+
         expect(solutionBoard.get('n')).to.equal(n);
         expect(numPieces).to.equal(n);
         expect(solutionBoard.hasAnyQueensConflicts()).to.be.equal(false);
@@ -68,10 +68,10 @@ describe('solvers', function() {
 
   describe('countNQueensSolutions()', function() {
 
-    it('finds the number of valid solutions for n of 0-8', function() {
-      _.range(0, 9).map(function(n) {
+    it('finds the number of valid solutions for n of 0-9', function() {
+      _.range(0, 10).map(function(n) {
         var solutionCount = countNQueensSolutions(n);
-        var expectedSolutionCount = [1, 1, 0, 0, 2, 10, 4, 40, 92][n];
+        var expectedSolutionCount = [1, 1, 0, 0, 2, 10, 4, 40, 92, 352, 724, 2680, 14200][n];
 
         expect(solutionCount).to.be.equal(expectedSolutionCount);
       });
